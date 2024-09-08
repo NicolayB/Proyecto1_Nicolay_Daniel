@@ -67,3 +67,25 @@ print(data["Functioning Day"].value_counts())
 col = "Rented Bike Count"
 X = data.drop(col, axis=1)
 Y = data[col]
+
+# Graficar la renta de bicicletas en cada fecha por hora
+data.plot(x="Date",y="Rented Bike Count")
+plt.title("Renta de bicicletas por cada hora de cada fecha")
+plt.xlabel("Fecha")
+plt.ylabel("Bicicletas rentadas")
+plt.grid()
+plt.show()
+
+# Graficar el comportamiento de la renta de bicicletas promedio por fecha
+rented_by_date = data.groupby("Date")["Rented Bike Count"].describe()
+plt.figure(figsize=(15,8))
+plt.plot(rented_by_date["mean"])
+plt.title("Renta de bicicletas promedio por fecha")
+plt.xlabel("Fecha")
+plt.ylabel("Bicicletas rentadas")
+plt.show()
+
+# Distribución de la renta de bicicletas
+plt.hist(data["Rented Bike Count"])
+plt.title("Distribución de la renta de bicicletas")
+plt.show()
