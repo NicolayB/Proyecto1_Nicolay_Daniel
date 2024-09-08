@@ -62,3 +62,8 @@ print(data["Holiday"].unique())
 print(data["Holiday"].value_counts())
 print(data["Functioning Day"].unique())
 print(data["Functioning Day"].value_counts())
+
+# Creación de variables explicativas y variable de interés 
+col = "Rented Bike Count"
+X = data.drop(col, axis=1)
+Y = data[col]
