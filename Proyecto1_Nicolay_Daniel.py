@@ -89,3 +89,31 @@ plt.show()
 plt.hist(data["Rented Bike Count"])
 plt.title("Distribución de la renta de bicicletas")
 plt.show()
+
+# Comportamiento de las variables explicativas y la variable de interés
+sns.pairplot(data=data)
+plt.show()
+
+# Mapa de calor de la correlación entre variables
+correlacion = data.corr()
+plt.figure(figsize=(15,8))
+sns.heatmap(correlacion, cmap="Blues", annot=True)
+plt.title("Correlación entre variables")
+plt.show()
+
+# Mapa de calor de correlación de las variables con la variable de interés
+correlacion2 = pd.DataFrame(X.corrwith(Y))
+sns.heatmap(correlacion2, cmap="Blues", annot=True)
+plt.title("Correlación de las variables con la variable de interés")
+plt.show()
+
+# Gráficos de correlación con regresión
+sns.pairplot(data, x_vars=data[data.columns[[1,2]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[3,4]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[5,6]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[7,8]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[9,10]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[11,12]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[13,14]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+plt.show()
