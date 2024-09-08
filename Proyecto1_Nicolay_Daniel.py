@@ -21,3 +21,10 @@ print(data)
 
 # Valores faltantes
 print(data.isnull().sum())
+
+# Estadísticas descriptivas
+print(data.describe())
+
+# Tipos de datos
+types = data.dtypes.value_counts()
+print(f"Tipos de variables en los datos: \n{types}")
