@@ -73,7 +73,7 @@ col = "Rented Bike Count"
 X = data.drop(col, axis=1)
 Y = data[col]
 
-# Graficar la renta de bicicletas en cada fecha por hora
+"""# Graficar la renta de bicicletas en cada fecha por hora
 data.plot(x="Date",y="Rented Bike Count")
 plt.title("Renta de bicicletas por cada hora de cada fecha")
 plt.xlabel("Fecha")
@@ -121,7 +121,7 @@ sns.pairplot(data, x_vars=data[data.columns[[9,10]]], y_vars="Rented Bike Count"
 sns.pairplot(data, x_vars=data[data.columns[[11,12]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[13,14]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-plt.show()
+plt.show()"""
 
 # Modelo de regresión
 # Convertir las fechas en float
@@ -136,3 +136,24 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 vif = [variance_inflation_factor(X.values,i) for i in range(X.shape[1])]
 for i in range(0,X.shape[1]):
     print(f"VIF de {X.columns[i]}:",vif[i])
+
+# Puntos de influencia
+# Distancia de cook
+model_cook = model.get_influence().cooks_distance[0]
+
+n = x_train.shape[0]
+
+# Umbral
+critical_d = 4/n
+print("Umbral con distancia de Cook:", critical_d)
+
+# Posibles outliers con influencia
+outliers = model_cook > critical_d
+print(x_train.index[outliers])
+
+# Se eliminan los outliers de los datos de entrenamiento
+x_train_nuevo = x_train.drop(x_train.index[outliers], axis=0)
+y_train_nuevo = y_train.drop(y_train.index[outliers], axis=0)
+
+model_nuevo = sm.OLS(y_train_nuevo,x_train_nuevo).fit()
+print(model_nuevo.summary())
