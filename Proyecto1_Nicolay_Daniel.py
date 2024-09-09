@@ -73,7 +73,7 @@ col = "Rented Bike Count"
 X = data.drop(col, axis=1)
 Y = data[col]
 
-"""# Graficar la renta de bicicletas en cada fecha por hora
+# Graficar la renta de bicicletas en cada fecha por hora
 data.plot(x="Date",y="Rented Bike Count")
 plt.title("Renta de bicicletas por cada hora de cada fecha")
 plt.xlabel("Fecha")
@@ -121,7 +121,7 @@ sns.pairplot(data, x_vars=data[data.columns[[9,10]]], y_vars="Rented Bike Count"
 sns.pairplot(data, x_vars=data[data.columns[[11,12]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[13,14]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-plt.show()"""
+plt.show()
 
 # Modelo de regresión
 # Convertir las fechas en float
@@ -157,3 +157,21 @@ y_train_nuevo = y_train.drop(y_train.index[outliers], axis=0)
 
 model_nuevo = sm.OLS(y_train_nuevo,x_train_nuevo).fit()
 print(model_nuevo.summary())
+
+# Prueba de multicolinealidad
+vif = [variance_inflation_factor(X.values,i) for i in range(X.shape[1])]
+for i in range(0,X.shape[1]):
+    print(f"VIF de {X.columns[i]}:",vif[i])
+
+# Promedio Temperature y Dew point temperature
+x_train = x_train_nuevo
+y_train = y_train_nuevo
+#x_train["Temperature_avr"] = (x_train["Temperature(C)"]+x_train["Dew point temperature(C)"])/2
+# Eliminación de la variables
+x_train = x_train.drop(["Date","Temperature(C)", "Visibility (10m)"], axis=1)
+model_prueba1 = sm.OLS(y_train, x_train).fit()
+print(model_prueba1.summary())
+
+x_train = x_train.drop(["Autumn"], axis=1)
+model_prueba1 = sm.OLS(y_train, x_train).fit()
+print(model_prueba1.summary())
