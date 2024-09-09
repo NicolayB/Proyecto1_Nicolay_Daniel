@@ -73,7 +73,7 @@ col = "Rented Bike Count"
 X = data.drop(col, axis=1)
 Y = data[col]
 
-# Graficar la renta de bicicletas en cada fecha por hora
+"""# Graficar la renta de bicicletas en cada fecha por hora
 data.plot(x="Date",y="Rented Bike Count")
 plt.title("Renta de bicicletas por cada hora de cada fecha")
 plt.xlabel("Fecha")
@@ -116,7 +116,7 @@ sns.pairplot(data, x_vars=data[data.columns[[1,2,3]]], y_vars="Rented Bike Count
 sns.pairplot(data, x_vars=data[data.columns[[4,5,6,7]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[8,9,10,11]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[12,13,14,15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-plt.show()
+plt.show()"""
 
 # Modelo de regresión
 # Convertir las fechas en float
@@ -183,3 +183,34 @@ x_train, x_test, y_train, y_test = train_test_split(X_ideal1, Y_ideal1, random_s
 x_train = sm.add_constant(x_train)
 model_ideal1 = sm.OLS(y_train, x_train).fit()
 print(model_ideal1.summary())
+
+# Prueba Shapiro-Wilk
+shapiro, p_value = stats.shapiro(model_ideal1.resid)
+print(f"p_value: {p_value}")
+
+# Se hace la tranformación de la variable dependiente
+Y_ideal1_tranformado = np.sqrt(Y_ideal1)
+x_train, x_test, y_train, y_test = train_test_split(X_ideal1, Y_ideal1_tranformado, random_state=0)
+x_train = sm.add_constant(x_train)
+model_ideal1_t = sm.OLS(y_train, x_train).fit()
+print(model_ideal1_t.summary())
+
+# Prueba Shapiro-Wilk
+shapiro, p_value = stats.shapiro(model_ideal1_t.resid)
+print(f"p_value: {p_value}")
+
+X_ideal2 = X_ideal1.drop(["Wind speed (m/s)"], axis=1)
+Y_ideal2 = Y_ideal1_tranformado
+x_train, x_test, y_train, y_test = train_test_split(X_ideal2, Y_ideal2, random_state=0)
+x_train = sm.add_constant(x_train)
+model_ideal2 = sm.OLS(y_train, x_train).fit()
+print(model_ideal2.summary())
+
+# Prueba Shapiro-Wilk
+shapiro, p_value = stats.shapiro(model_ideal2.resid)
+print(f"p_value: {p_value}")
+
+# Prueba de multicolinealidad
+vif = [variance_inflation_factor(X_ideal2.values,i) for i in range(X_ideal2.shape[1])]
+for i in range(0,X_ideal2.shape[1]):
+    print(f"VIF de {X_ideal2.columns[i]}:",vif[i])
