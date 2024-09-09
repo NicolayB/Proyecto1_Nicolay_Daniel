@@ -130,3 +130,9 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y , random_state=0)
 x_train = sm.add_constant(x_train)
 model = sm.OLS(y_train, x_train).fit()
 print(model.summary())
+
+# Prueba de multicolinealidad
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+vif = [variance_inflation_factor(X.values,i) for i in range(X.shape[1])]
+for i in range(0,X.shape[1]):
+    print(f"VIF de {X.columns[i]}:",vif[i])
