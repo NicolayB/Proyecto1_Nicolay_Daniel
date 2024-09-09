@@ -112,15 +112,10 @@ sns.heatmap(correlacion2, cmap="Blues", annot=True)
 plt.title("Correlación de las variables con la variable de interés")
 plt.show()
 
-# Gráficos de correlación con regresión
-sns.pairplot(data, x_vars=data[data.columns[[1,2]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-sns.pairplot(data, x_vars=data[data.columns[[3,4]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-sns.pairplot(data, x_vars=data[data.columns[[5,6]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-sns.pairplot(data, x_vars=data[data.columns[[7,8]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-sns.pairplot(data, x_vars=data[data.columns[[9,10]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-sns.pairplot(data, x_vars=data[data.columns[[11,12]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-sns.pairplot(data, x_vars=data[data.columns[[13,14]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-sns.pairplot(data, x_vars=data[data.columns[[15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[1,2,3]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[4,5,6,7]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[8,9,10,11]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
+sns.pairplot(data, x_vars=data[data.columns[[12,13,14,15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 plt.show()
 
 # Modelo de regresión
@@ -155,6 +150,10 @@ print(x_train.index[outliers])
 x_train_nuevo = x_train.drop(x_train.index[outliers], axis=0)
 y_train_nuevo = y_train.drop(y_train.index[outliers], axis=0)
 
+# Inicialización modelo óptimo
+X2 = X.drop(x_train.index[outliers], axis=0)
+Y2 = Y.drop(y_train.index[outliers], axis=0)
+
 model_nuevo = sm.OLS(y_train_nuevo,x_train_nuevo).fit()
 print(model_nuevo.summary())
 
@@ -175,3 +174,12 @@ print(model_prueba1.summary())
 x_train = x_train.drop(["Autumn"], axis=1)
 model_prueba1 = sm.OLS(y_train, x_train).fit()
 print(model_prueba1.summary())
+
+# Modelo ideal 1
+X_ideal1 = X2.drop(["Date","Temperature(C)", "Visibility (10m)","Autumn"], axis=1)
+Y_ideal1 = Y2
+
+x_train, x_test, y_train, y_test = train_test_split(X_ideal1, Y_ideal1, random_state=0)
+x_train = sm.add_constant(x_train)
+model_ideal1 = sm.OLS(y_train, x_train).fit()
+print(model_ideal1.summary())
