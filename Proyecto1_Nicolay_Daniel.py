@@ -3,6 +3,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn import metrics
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
+import scipy.stats as stats
 
 path = os.getcwd()
 print(path)
@@ -117,3 +122,11 @@ sns.pairplot(data, x_vars=data[data.columns[[11,12]]], y_vars="Rented Bike Count
 sns.pairplot(data, x_vars=data[data.columns[[13,14]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 plt.show()
+
+# Modelo de regresión
+# Convertir las fechas en float
+X["Date"] = (X["Date"]-pd.Timestamp("2017-11-30"))/pd.Timedelta(days=1)
+x_train, x_test, y_train, y_test = train_test_split(X, Y , random_state=0)
+x_train = sm.add_constant(x_train)
+model = sm.OLS(y_train, x_train).fit()
+print(model.summary())
