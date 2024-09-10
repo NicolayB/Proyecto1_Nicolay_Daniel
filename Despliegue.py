@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import requests
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import metrics
@@ -16,10 +17,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 
-path = os.getcwd()
-print(path)
 
-data = pd.read_csv("SeoulBikeData_utf8.csv")
+# Cargar archivo desde el repositorio de Git
+data = pd.read_csv('https://raw.githubusercontent.com/NicolayB/Proyecto1_Nicolay_Daniel/main/SeoulBikeData_utf8.csv') 
+
+#data = pd.read_csv("SeoulBikeData_utf8.csv")
 
 # Pasar la variable de interés al final del DataFrame
 v_interes = data.pop("Rented Bike Count")
@@ -101,6 +103,8 @@ app = dash.Dash(__name__)
 app.layout = html.Div([
     # Sección de visualizaciones
     html.Div([
+        # Agrega el botón aquí
+        dcc.Input(id='submit-button', type='submit', value='Actualizar'),
         dcc.Graph(id='histogram'),
         dcc.Graph(id='bikes-by-season'),
         dcc.Graph(id='bikes-over-time')
