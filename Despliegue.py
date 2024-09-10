@@ -98,48 +98,90 @@ model_ideal = sm.OLS(y_transformed, x_train_nuevo).fit()
 # Crear la aplicación Dash
 app = dash.Dash(__name__)
 
-
 # Layout de la aplicación
 app.layout = html.Div([
+    # Sección de filtros
+    dcc.Dropdown(
+        id='holiday-filter',
+        options=[
+            {'label': 'Todos los días', 'value': 'all'},
+            {'label': 'Días festivos', 'value': 'holiday'},
+            {'label': 'Días no festivos', 'value': 'non-holiday'}
+        ],
+        value='all'
+    ),
     # Sección de visualizaciones
-    html.Div([
-        # Agrega el botón aquí
-        dcc.Input(id='submit-button', type='submit', value='Actualizar'),
+    html.Div(id='graphs-container', children=[
         dcc.Graph(id='histogram'),
         dcc.Graph(id='bikes-by-season'),
-        dcc.Graph(id='bikes-over-time')
+        dcc.Graph(id='bikes-over-time'),
+        dcc.Graph(id='regression-graph')
     ])
 ])
 
 # Callback para actualizar el histograma
 @app.callback(
     Output('histogram', 'figure'),
-    [Input('submit-button', 'n_clicks')]
+    [Input('holiday-filter', 'value')]
 )
-def update_histogram(n_clicks):
-    fig = px.histogram(data, x="Rented Bike Count", nbins=20, title="Histograma de Bicicletas Rentadas")
+
+def update_histogram(selected_holiday):
+    filtered_data = data
+    if selected_holiday == 'holiday':
+        filtered_data = data[data['Holiday'] == True]  # Ajusta la columna 'Holiday' según tu DataFrame
+    elif selected_holiday == 'non-holiday':
+        filtered_data = data[data['Holiday'] == False]
+
+    fig = px.histogram(filtered_data, x="Rented Bike Count", nbins=20, title="Histograma de Bicicletas Rentadas")
     return fig
 
 # Callback para actualizar el gráfico de bicicletas por estación
 @app.callback(
     Output('bikes-by-season', 'figure'),
-    [Input('submit-button', 'n_clicks')]
+    [Input('holiday-filter', 'value')]
 )
+def update_boxplot(selected_holiday):
+    filtered_data = data
+    if selected_holiday == 'holiday':
+        filtered_data = data[data['Holiday'] == True]
+    elif selected_holiday == 'non-holiday':
+        filtered_data = data[data['Holiday'] == False]
 
-def update_boxplot(n_clicks):
-    fig = px.box(data, x="Seasons", y="Rented Bike Count",
-                title="Relación entre la estación del año y el número de bicicletas rentadas")
+    fig = px.box(filtered_data, x="Seasons", y="Rented Bike Count",
+                 title="Relación entre la estación del año y el número de bicicletas rentadas")
     return fig
 
 # Callback para actualizar el gráfico de línea de bicicletas a lo largo del tiempo
 @app.callback(
     Output('bikes-over-time', 'figure'),
-    [Input('submit-button', 'n_clicks')]
+    [Input('holiday-filter', 'value')]
 )
-def update_time_series(n_clicks):
-    fig = px.line(data, x="Date", y="Rented Bike Count", title="Evolución de las Bicicletas Rentadas")
+def update_time_series(selected_holiday):
+    filtered_data = data
+    if selected_holiday == 'holiday':
+        filtered_data = data[data['Holiday'] == True]
+    elif selected_holiday == 'non-holiday':
+        filtered_data = data[data['Holiday'] == False]
+
+    fig = px.line(filtered_data, x="Date", y="Rented Bike Count", title="Evolución de las Bicicletas Rentadas")
     return fig
 
+# Callback para actualizar el gráfico de regresión
+@app.callback(
+    Output('regression-graph', 'figure'),
+    [Input('holiday-filter', 'value')]
+)
+
+def update_regression_graph(selected_holiday):
+    # Realizar predicciones
+    predictions = model.predict(x_train_nuevo)
+    df_predictions = pd.DataFrame({'Valor objetivo': y_transformed, 'predictions': predictions})
+
+    # Crear el gráfico
+    fig = px.scatter(df_predictions, y='Valor objetivo',
+                    trendline='ols', trendline_color_override='red',
+                    title='Regresión Lineal')
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
