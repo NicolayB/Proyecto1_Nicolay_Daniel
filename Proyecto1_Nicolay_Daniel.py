@@ -119,98 +119,29 @@ sns.pairplot(data, x_vars=data[data.columns[[12,13,14,15]]], y_vars="Rented Bike
 plt.show()"""
 
 # Modelo de regresión
-# Convertir las fechas en float
-X["Date"] = (X["Date"]-pd.Timestamp("2017-11-30"))/pd.Timedelta(days=1)
-x_train, x_test, y_train, y_test = train_test_split(X, Y , random_state=0)
-x_train = sm.add_constant(x_train)
-model = sm.OLS(y_train, x_train).fit()
+
+#Seleccion de variables para el modelo ideal 1 
+features = ['Temperature(C)', 'Humidity(%)', 'Wind speed (m/s)', 'Visibility (10m)', 'Rainfall(mm)', 'Snowfall (cm)', 'Holiday' , 'Functioning Day' ]
+X = data[features]
+Y = data['Rented Bike Count']
+X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+
+# Agregar constante explíticamente
+X_train = sm.add_constant(X_train)
+# regresión usando mínimos cuadrados ordinarios (ordinary least squares - OLS) 
+model = sm.OLS(y_train, X_train).fit()
+# resumen de resultados
 print(model.summary())
 
-# Prueba de multicolinealidad
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-vif = [variance_inflation_factor(X.values,i) for i in range(X.shape[1])]
-for i in range(0,X.shape[1]):
-    print(f"VIF de {X.columns[i]}:",vif[i])
+#Eliminación de variables con una significancia relevante
+features = ['Temperature(C)', 'Wind speed (m/s)', 'Rainfall(mm)', 'Holiday' , 'Functioning Day' ]
+X = data[features]
+y = data['Rented Bike Count']
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
 
-# Puntos de influencia
-# Distancia de cook
-model_cook = model.get_influence().cooks_distance[0]
-
-n = x_train.shape[0]
-
-# Umbral
-critical_d = 4/n
-print("Umbral con distancia de Cook:", critical_d)
-
-# Posibles outliers con influencia
-outliers = model_cook > critical_d
-print(x_train.index[outliers])
-
-# Se eliminan los outliers de los datos de entrenamiento
-x_train_nuevo = x_train.drop(x_train.index[outliers], axis=0)
-y_train_nuevo = y_train.drop(y_train.index[outliers], axis=0)
-
-# Inicialización modelo óptimo
-X2 = X.drop(x_train.index[outliers], axis=0)
-Y2 = Y.drop(y_train.index[outliers], axis=0)
-
-model_nuevo = sm.OLS(y_train_nuevo,x_train_nuevo).fit()
-print(model_nuevo.summary())
-
-# Prueba de multicolinealidad
-vif = [variance_inflation_factor(X.values,i) for i in range(X.shape[1])]
-for i in range(0,X.shape[1]):
-    print(f"VIF de {X.columns[i]}:",vif[i])
-
-# Promedio Temperature y Dew point temperature
-x_train = x_train_nuevo
-y_train = y_train_nuevo
-#x_train["Temperature_avr"] = (x_train["Temperature(C)"]+x_train["Dew point temperature(C)"])/2
-# Eliminación de la variables
-x_train = x_train.drop(["Date","Temperature(C)", "Visibility (10m)"], axis=1)
-model_prueba1 = sm.OLS(y_train, x_train).fit()
-print(model_prueba1.summary())
-
-x_train = x_train.drop(["Autumn"], axis=1)
-model_prueba1 = sm.OLS(y_train, x_train).fit()
-print(model_prueba1.summary())
-
-# Modelo ideal 1
-X_ideal1 = X2.drop(["Date","Temperature(C)", "Visibility (10m)","Autumn"], axis=1)
-Y_ideal1 = Y2
-
-x_train, x_test, y_train, y_test = train_test_split(X_ideal1, Y_ideal1, random_state=0)
-x_train = sm.add_constant(x_train)
-model_ideal1 = sm.OLS(y_train, x_train).fit()
-print(model_ideal1.summary())
-
-# Prueba Shapiro-Wilk
-shapiro, p_value = stats.shapiro(model_ideal1.resid)
-print(f"p_value: {p_value}")
-
-# Se hace la tranformación de la variable dependiente
-Y_ideal1_tranformado = np.sqrt(Y_ideal1)
-x_train, x_test, y_train, y_test = train_test_split(X_ideal1, Y_ideal1_tranformado, random_state=0)
-x_train = sm.add_constant(x_train)
-model_ideal1_t = sm.OLS(y_train, x_train).fit()
-print(model_ideal1_t.summary())
-
-# Prueba Shapiro-Wilk
-shapiro, p_value = stats.shapiro(model_ideal1_t.resid)
-print(f"p_value: {p_value}")
-
-X_ideal2 = X_ideal1.drop(["Wind speed (m/s)"], axis=1)
-Y_ideal2 = Y_ideal1_tranformado
-x_train, x_test, y_train, y_test = train_test_split(X_ideal2, Y_ideal2, random_state=0)
-x_train = sm.add_constant(x_train)
-model_ideal2 = sm.OLS(y_train, x_train).fit()
-print(model_ideal2.summary())
-
-# Prueba Shapiro-Wilk
-shapiro, p_value = stats.shapiro(model_ideal2.resid)
-print(f"p_value: {p_value}")
-
-# Prueba de multicolinealidad
-vif = [variance_inflation_factor(X_ideal2.values,i) for i in range(X_ideal2.shape[1])]
-for i in range(0,X_ideal2.shape[1]):
-    print(f"VIF de {X_ideal2.columns[i]}:",vif[i])
+# agregar constante explíticamente
+X_train = sm.add_constant(X_train)
+# regresión usando mínimos cuadrados ordinarios (ordinary least squares - OLS) 
+model = sm.OLS(y_train, X_train).fit()
+# resumen de resultados
+print(model.summary())
