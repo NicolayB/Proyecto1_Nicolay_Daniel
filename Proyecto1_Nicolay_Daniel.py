@@ -6,6 +6,7 @@ import seaborn as sns
 from sklearn import metrics
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 import statsmodels.api as sm
 import scipy.stats as stats
 
@@ -164,3 +165,19 @@ y_train_nuevo = y_train.drop(y_train.index[outliers], axis=0)
 
 model_nuevo = sm.OLS(y_train_nuevo,x_train_nuevo).fit()
 print(model_nuevo.summary())
+
+#Aplicar transformación de raíz cuadrada
+y_transformed = np.sqrt(y_train_nuevo)
+
+# Ajusta el modelo con los datos transformados
+model_ideal = sm.OLS(y_transformed, x_train_nuevo).fit()
+print(model_ideal.summary())
+
+# Prueba Shapiro-Wilk
+shapiro, p_value = stats.shapiro(model_ideal.resid)
+print(f"p_value: {p_value}")
+
+# Prueba de multicolinealidad
+vif = [variance_inflation_factor(x_train_nuevo.values, i) for i in range(x_train_nuevo.shape[1])]
+for i in range(len(vif)):
+    print(f"VIF de {x_train_nuevo.columns[i]}: {vif[i]}")
