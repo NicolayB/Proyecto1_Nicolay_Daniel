@@ -55,6 +55,7 @@ data["Summer"] = data["Seasons"].map({"Winter":0, "Spring":0, "Summer":1, "Autum
 data["Autumn"] = data["Seasons"].map({"Winter":0, "Spring":0, "Summer":0, "Autumn":1})
 data.drop("Seasons", axis=1, inplace=True)
 
+# Pasar la variable de interés al final del DataFrame
 v_interes = data.pop("Rented Bike Count")
 data["Rented Bike Count"] = v_interes
 print(data)
@@ -99,14 +100,16 @@ plt.plot(rented_by_date["mean"])
 plt.title("Renta de bicicletas promedio por fecha")
 plt.xlabel("Fecha")
 plt.ylabel("Bicicletas rentadas")
+plt.grid()
 plt.show()
 
 # Distribución de la renta de bicicletas
-plt.hist(data["Rented Bike Count"])
+plt.hist(data["Rented Bike Count"], bins=30)
 plt.title("Distribución de la renta de bicicletas")
+plt.grid()
 plt.show()
-
-# Comportamiento de las variables explicativas y la variable de interés
+"""
+"""# Comportamiento de las variables explicativas y la variable de interés
 sns.pairplot(data=data)
 plt.show()
 
