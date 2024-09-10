@@ -145,3 +145,22 @@ X_train = sm.add_constant(X_train)
 model = sm.OLS(y_train, X_train).fit()
 # resumen de resultados
 print(model.summary())
+
+# disntacia de Cook
+model_cooksd = model.get_influence().cooks_distance[0]
+# get length of df to obtain n
+n = X_train.shape[0]
+# umbral
+critical_d = 4/n
+print('Umbral con distancia de Cook:', critical_d)
+
+# puntos que podrían ser ourliers con alta influencia
+outliers = model_cooksd > critical_d
+print(X_train.index[outliers], "\n", model_cooksd[outliers])
+
+# Se eliminan los outliers de los datos de entrenamiento
+x_train_nuevo = X_train.drop(X_train.index[outliers], axis=0)
+y_train_nuevo = y_train.drop(y_train.index[outliers], axis=0)
+
+model_nuevo = sm.OLS(y_train_nuevo,x_train_nuevo).fit()
+print(model_nuevo.summary())
