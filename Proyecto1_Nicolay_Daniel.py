@@ -69,12 +69,22 @@ print(data["Holiday"].value_counts())
 print(data["Functioning Day"].unique())
 print(data["Functioning Day"].value_counts())
 
+# Fechas de cada estación
+invierno = [data[data["Winter"]==1]["Date"].min(), data[data["Winter"]==1]["Date"].max()]
+primavera = [data[data["Spring"]==1]["Date"].min(), data[data["Spring"]==1]["Date"].max()]
+verano = [data[data["Summer"]==1]["Date"].min(), data[data["Summer"]==1]["Date"].max()]
+otoño = [data[data["Autumn"]==1]["Date"].min(), data[data["Autumn"]==1]["Date"].max()]
+print(f"Invierno: {invierno}")
+print(f"Primavera: {primavera}")
+print(f"Verano: {verano}")
+print(f"Otoño: {otoño}")
+
 # Creación de variables explicativas y variable de interés 
 col = "Rented Bike Count"
 X = data.drop(col, axis=1)
 Y = data[col]
 
-"""# Graficar la renta de bicicletas en cada fecha por hora
+# Graficar la renta de bicicletas en cada fecha por hora
 data.plot(x="Date",y="Rented Bike Count")
 plt.title("Renta de bicicletas por cada hora de cada fecha")
 plt.xlabel("Fecha")
@@ -117,7 +127,7 @@ sns.pairplot(data, x_vars=data[data.columns[[1,2,3]]], y_vars="Rented Bike Count
 sns.pairplot(data, x_vars=data[data.columns[[4,5,6,7]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[8,9,10,11]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
 sns.pairplot(data, x_vars=data[data.columns[[12,13,14,15]]], y_vars="Rented Bike Count", height=7, kind="reg", plot_kws={"line_kws":{"color":"red"}})
-plt.show()"""
+plt.show()
 
 # Modelo de regresión
 
