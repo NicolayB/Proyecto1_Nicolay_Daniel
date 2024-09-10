@@ -144,7 +144,7 @@ model = sm.OLS(y_train, X_train).fit()
 # resumen de resultados
 print(model.summary())
 
-#Eliminación de variables con una significancia irrelevante
+#Eliminación de variables con una significancia relevante
 features = ['Temperature(C)', 'Wind speed (m/s)', 'Rainfall(mm)', 'Holiday' , 'Functioning Day' ]
 X = data[features]
 y = data['Rented Bike Count']
@@ -157,32 +157,17 @@ model = sm.OLS(y_train, X_train).fit()
 # resumen de resultados
 print(model.summary())
 
-# Prueba de multicolinealidad
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-vif = [variance_inflation_factor(X.values,i) for i in range(X.shape[1])]
-for i in range(0,X.shape[1]):
-    print(f"VIF de {X.columns[i]}:",vif[i])
-
-# Influencia de las observaciones
-fig = sm.graphics.influence_plot(model)
-
-# Puntos de influencia
-# Distancia de cook
-model_cook = model.get_influence().cooks_distance[0]
-
+# disntacia de Cook
+model_cooksd = model.get_influence().cooks_distance[0]
+# get length of df to obtain n
 n = X_train.shape[0]
-
-# Umbral
+# umbral
 critical_d = 4/n
 print('Umbral con distancia de Cook:', critical_d)
 
 # puntos que podrían ser ourliers con alta influencia
-outliers = model_cook > critical_d
-print(X_train.index[outliers], "\n", model_cook[outliers])
-
-# Inicialización modelo óptimo
-X2 = X.drop(X_train.index[outliers], axis=0)
-Y2 = Y.drop(y_train.index[outliers], axis=0)
+outliers = model_cooksd > critical_d
+print(X_train.index[outliers], "\n", model_cooksd[outliers])
 
 # Se eliminan los outliers de los datos de entrenamiento
 x_train_nuevo = X_train.drop(X_train.index[outliers], axis=0)
@@ -197,32 +182,6 @@ y_transformed = np.sqrt(y_train_nuevo)
 # Ajusta el modelo con los datos transformados
 model_ideal = sm.OLS(y_transformed, x_train_nuevo).fit()
 print(model_ideal.summary())
-# Prueba de multicolinealidad
-vif = [variance_inflation_factor(X.values,i) for i in range(X.shape[1])]
-for i in range(0,X.shape[1]):
-    print(f"VIF de {X.columns[i]}:",vif[i])
-
-"""# Promedio Temperature y Dew point temperature
-x_train["Temperature_avr"] = (x_train["Temperature(C)"]+x_train["Dew point temperature(C)"])/2"""
-x_train = x_train_nuevo
-y_train = y_train_nuevo
-# Eliminación de la variables
-x_train = x_train.drop(["Date","Temperature(C)", "Visibility (10m)"], axis=1)
-model_prueba1 = sm.OLS(y_train, x_train).fit()
-print(model_prueba1.summary())
-
-x_train = x_train.drop(["Autumn"], axis=1)
-model_prueba1 = sm.OLS(y_train, x_train).fit()
-print(model_prueba1.summary())
-
-# Modelo ideal 1
-X_ideal1 = X2.drop(["Date","Temperature(C)", "Visibility (10m)","Autumn"], axis=1)
-Y_ideal1 = Y2
-
-x_train, x_test, y_train, y_test = train_test_split(X_ideal1, Y_ideal1, random_state=0)
-x_train = sm.add_constant(x_train)
-model_ideal1 = sm.OLS(y_train, x_train).fit()
-print(model_ideal1.summary())
 
 # Prueba Shapiro-Wilk
 shapiro, p_value = stats.shapiro(model_ideal.resid)
